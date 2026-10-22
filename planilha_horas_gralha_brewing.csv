@@ -1,0 +1,29 @@
+Modulo;Etapa / Entregavel;Profissional Responsavel;Complexidade;Horas Estimadas (Manual);Valor Hora Ref. (R$);Custo Estimado (R$)
+1. Branding & Identidade Visual;1.1 Briefing, Imersao Cervejeira e Pesquisa de Mercado (Curitiba);Brand Designer;Media;4;120,00;480,00
+1. Branding & Identidade Visual;1.2 Moodboard, Conceituacao (Gralha-Azul + Lupulo) e Rascunhos;Brand Designer;Alta;6;120,00;720,00
+1. Branding & Identidade Visual;1.3 Ilustracao Autoral e Vetorizacao da Gralha-Azul e Lupulos;Brand Designer / Ilustrador;Alta;10;120,00;1200,00
+1. Branding & Identidade Visual;1.4 Tipografia Curva (Gralha Brewing.Co) e Composicao do Selo;Brand Designer;Media;4;120,00;480,00
+1. Branding & Identidade Visual;1.5 Variacoes de Cor (Escuro, Claro, Redondo, Simbolo) e Recorte PNG Transparente;Brand Designer;Media;4;120,00;480,00
+2. UX/UI Design & Copywriting;2.1 Arquitetura da Informacao e Wireframes (Separacao Marca vs. Loja);UX/UI Designer;Media;5;130,00;650,00
+2. UX/UI Design & Copywriting;2.2 Direcao de Arte Editorial, Tipografia e Sistema de Cores Web;UI Designer Senior;Alta;6;130,00;780,00
+2. UX/UI Design & Copywriting;2.3 Redacao Criativa (Storytelling 2024 + Fichas Sensoriais Pilsens/IPAs) e Curadoria de Fotos;Copywriter / Designer;Media;6;110,00;660,00
+2. UX/UI Design & Copywriting;2.4 Layout de Alta Fidelidade Desktop e Mobile (Paginas 1 e 2);UI Designer Senior;Alta;10;130,00;1300,00
+3. Front-End Pagina 1 (A Marca);3.1 Setup do Projeto (React, Vite, Tailwind CSS, Fontes e Favicon);Desenvolvedor Front-End;Baixa;3;140,00;420,00
+3. Front-End Pagina 1 (A Marca);3.2 Modal Age Gate (+18) com Persistencia e Consumo Responsavel;Desenvolvedor Front-End;Media;3;140,00;420,00
+3. Front-End Pagina 1 (A Marca);3.3 Navbar Editorial Responsiva com Logo Transparente a Esquerda;Desenvolvedor Front-End;Media;4;140,00;560,00
+3. Front-End Pagina 1 (A Marca);3.4 Hero Section Institucional com Mascara Fotografica e Alinhamento de Dobra;Desenvolvedor Front-End;Media;4;140,00;560,00
+3. Front-End Pagina 1 (A Marca);3.5 Secoes de Storytelling (Origem 2024, Escolas Cervejeiras e Processo);Desenvolvedor Front-End;Alta;8;140,00;1120,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.1 Estrutura de Dados do Catalogo (ABV, IBU, Maltes, Lupulos, Harmonizacao e Packs);Desenvolvedor Full-Stack;Media;4;150,00;600,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.2 Grid Fotografico do Catalogo, Filtros por Estilo e Ficha Sensorial Expansivel;Desenvolvedor Front-End;Alta;8;150,00;1200,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.3 Secao de Caixas Fechadas (Desconto Progressivo) e Estado Global da Sacola;Desenvolvedor Front-End;Media;6;150,00;900,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.4 Sacola Lateral (Drawer) e Barra Fixa de Meta para Frete Gratis em Curitiba;Desenvolvedor Front-End;Media;5;150,00;750,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.5 Integracao API ViaCEP e Regras de Entrega (Delivery Gelado CWB, Retirada, Transportadora);Desenvolvedor Full-Stack;Alta;5;150,00;750,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.6 Checkout Transparente (PIX com 5% OFF Automatico + Cartao + Protocolo de Pedido);Desenvolvedor Full-Stack;Alta;10;150,00;1500,00
+4. E-commerce Pagina 2 (Catalogo & Checkout);4.7 Refinamento Visual, Responsividade Mobile, Testes e Build de Producao;Designer & Dev;Media;5;140,00;700,00
+5. Back-End SQLite & Seguranca (OWASP / LGPD);5.1 Arquitetura SQLite Hardened (WAL, Foreign Keys, Secure Delete LGPD e Seed Transacional);Engenheiro Back-End;Alta;6;160,00;960,00
+5. Back-End SQLite & Seguranca (OWASP / LGPD);5.2 Criptografia em Repouso AES-256-GCM (PII), Blind Index HMAC-SHA256 e Mascaramento PCI-DSS;Especialista em Seguranca (AppSec);Alta;8;170,00;1360,00
+5. Back-End SQLite & Seguranca (OWASP / LGPD);5.3 Defesa HTTP OWASP (Headers CSP/HSTS, Rate Limiting por IP, Anti-XSS e Anti-Prototype Pollution);Especialista em Seguranca (AppSec);Alta;6;170,00;1020,00
+5. Back-End SQLite & Seguranca (OWASP / LGPD);5.4 API REST Isolada, Prepared Statements Anti-SQLi e Calculo de Preco/Estoque Server-Side;Engenheiro Back-End Senior;Alta;8;160,00;1280,00
+5. Back-End SQLite & Seguranca (OWASP / LGPD);5.5 Trilha de Auditoria (security_audit_logs), Auth Timing-Safe e Testes de Seguranca E2E;Especialista em Seguranca / QA;Alta;6;170,00;1020,00
+5. Back-End SQLite & Seguranca (OWASP / LGPD);5.6 Auditoria AppSec e Remediacao de Vulnerabilidades (Anti-Spoofing IP, Hardening PCI-DSS/GCM, Entropia IDOR e Anti-Pollution Deep);Especialista em Seguranca (AppSec);Alta;6;170,00;1020,00
+TOTAL GERAL;27 Entregaveis Completos (Branding + Design + Front-End + Back-End SQLite Blindado + Auditoria AppSec);Especialista Design, Dev & AppSec;-;160;143,06 (Media);22890,00

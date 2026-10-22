@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #111315;
+    color: #F4F1EA;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Hairline border utilities for editorial layout */
+.hairline-t {
+  border-top: 1px solid rgba(244, 241, 234, 0.12);
+}
+.hairline-b {
+  border-bottom: 1px solid rgba(244, 241, 234, 0.12);
+}
+.hairline-y {
+  border-top: 1px solid rgba(244, 241, 234, 0.12);
+  border-bottom: 1px solid rgba(244, 241, 234, 0.12);
+}
+.hairline-r {
+  border-right: 1px solid rgba(244, 241, 234, 0.12);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111315;
+}
+::-webkit-scrollbar-thumb {
+  background: #2B3137;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D88128;
+}

@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables & Cryptographic Keys (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+
+# SQLite Database & WAL files (Contains Encrypted PII)
+backend/data/*.sqlite
+backend/data/*.sqlite-shm
+backend/data/*.sqlite-wal
+*.db
+*.sqlite
+
+# Logs
+*.log
+npm-debug.log*
