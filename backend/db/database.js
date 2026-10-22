@@ -95,10 +95,29 @@ db.exec(`
  * Prepared Statements parametrizados (100% imunes a SQL Injection)
  */
 const insertProductStmt = db.prepare(`
-  INSERT OR IGNORE INTO products (
+  INSERT INTO products (
     id, type, name, style, category, abv, ibu, ebc, volume, price, original_price,
     batch, stock, image, short_desc, hops_json, malts_json, temp, glass, pairing_json
   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(id) DO UPDATE SET
+    name = excluded.name,
+    style = excluded.style,
+    category = excluded.category,
+    abv = excluded.abv,
+    ibu = excluded.ibu,
+    ebc = excluded.ebc,
+    volume = excluded.volume,
+    price = excluded.price,
+    original_price = excluded.original_price,
+    batch = excluded.batch,
+    image = excluded.image,
+    short_desc = excluded.short_desc,
+    hops_json = excluded.hops_json,
+    malts_json = excluded.malts_json,
+    temp = excluded.temp,
+    glass = excluded.glass,
+    pairing_json = excluded.pairing_json,
+    updated_at = datetime('now')
 `);
 
 const insertAuditStmt = db.prepare(`

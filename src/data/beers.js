@@ -52,8 +52,7 @@ export const BEERS_CATALOG = [
     price: 18.9,
     batch: 'Lote #014',
     isFlagship: true,
-    image:
-      'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/voo-rasante.jpg',
     shortDesc:
       'Dourada brilhante, espuma densa e persistente. Notas de pão fresco do malte Pilsen combinadas ao perfume herbal e floral do lúpulo Saaz.',
     hops: ['Saaz', 'Hallertau Mittelfrüh'],
