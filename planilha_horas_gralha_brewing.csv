@@ -26,4 +26,6 @@ Modulo;Etapa / Entregavel;Profissional Responsavel;Complexidade;Horas Estimadas 
 5. Back-End SQLite & Seguranca (OWASP / LGPD);5.4 API REST Isolada, Prepared Statements Anti-SQLi e Calculo de Preco/Estoque Server-Side;Engenheiro Back-End Senior;Alta;8;160,00;1280,00
 5. Back-End SQLite & Seguranca (OWASP / LGPD);5.5 Trilha de Auditoria (security_audit_logs), Auth Timing-Safe e Testes de Seguranca E2E;Especialista em Seguranca / QA;Alta;6;170,00;1020,00
 5. Back-End SQLite & Seguranca (OWASP / LGPD);5.6 Auditoria AppSec e Remediacao de Vulnerabilidades (Anti-Spoofing IP, Hardening PCI-DSS/GCM, Entropia IDOR e Anti-Pollution Deep);Especialista em Seguranca (AppSec);Alta;6;170,00;1020,00
-TOTAL GERAL;27 Entregaveis Completos (Branding + Design + Front-End + Back-End SQLite Blindado + Auditoria AppSec);Especialista Design, Dev & AppSec;-;160;143,06 (Media);22890,00
+6. DevOps, Versionamento & Cloud Deploy;6.1 Governanca Git, Blindagem de Segredos (.gitignore) e Publicacao no GitHub;Engenheiro DevOps / SecOps;Media;2;160,00;320,00
+6. DevOps, Versionamento & Cloud Deploy;6.2 Adaptador Serverless API (api/index.js), Rewrites/Headers de Seguranca (vercel.json) e Deploy Vercel;Engenheiro Cloud / Full-Stack;Alta;4;160,00;640,00
+TOTAL GERAL;29 Entregaveis Completos (Branding + Design + Front-End + Back-End Blindado + AppSec + Deploy Cloud);Especialista Design, Dev, AppSec & DevOps;-;166;143,67 (Media);23850,00
