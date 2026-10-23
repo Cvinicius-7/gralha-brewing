@@ -20,15 +20,41 @@ export default function HomeVariantBotanicalLabel({
   onOpenCart,
 }) {
   const [scrollY, setScrollY] = useState(0);
+  const [beersList, setBeersList] = useState(BEERS_CATALOG);
+  const [packsList, setPacksList] = useState(CURATED_PACKS);
   const [expandedHarmonizacao, setExpandedHarmonizacao] = useState({});
   const [addedItems, setAddedItems] = useState({});
   const [contactSent, setContactSent] = useState(false);
+  const [contactProtocol, setContactProtocol] = useState(null);
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const [contactError, setContactError] = useState(null);
   const [contactForm, setContactForm] = useState({
     name: '',
     phone: '',
     subject: 'Visitação & Taproom Curitiba',
     message: '',
   });
+
+  // Sincroniza lote e estoque real do banco SQLite
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/products')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (mounted && data) {
+          if (Array.isArray(data.beers) && data.beers.length > 0) {
+            setBeersList(data.beers);
+          }
+          if (Array.isArray(data.packs) && data.packs.length > 0) {
+            setPacksList(data.packs);
+          }
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,17 +104,39 @@ export default function HomeVariantBotanicalLabel({
     }, 1350);
   };
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
-    setContactSent(true);
-    setTimeout(() => {
+    setContactSubmitting(true);
+    setContactError(null);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Gralha-Client': 'webapp-v1',
+        },
+        body: JSON.stringify(contactForm),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao enviar sua mensagem.');
+      }
+
+      setContactProtocol(data.protocol || 'MSG-CWB');
+      setContactSent(true);
       setContactForm({
         name: '',
         phone: '',
         subject: 'Visitação & Taproom Curitiba',
         message: '',
       });
-    }, 400);
+    } catch (err) {
+      setContactError(err.message);
+    } finally {
+      setContactSubmitting(false);
+    }
   };
 
   return (
@@ -159,6 +207,8 @@ export default function HomeVariantBotanicalLabel({
           <img
             src="/logos/voo-rasante.jpg"
             alt="Cerveja artesanal Gralha Brewing Voo Rasante Pilsen"
+            fetchPriority="high"
+            decoding="async"
             style={{
               transform: `scale(${1.05 + heroProgress * 0.06}) translate3d(0, ${imageParallax}px, 0)`,
             }}
@@ -267,6 +317,8 @@ export default function HomeVariantBotanicalLabel({
               <img
                 src="/logos/context-lupulo-malte.jpg"
                 alt="Cones de lúpulo fresco abertos com lupulina dourada, grãos de malte e pá de brassagem"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#111315] via-[#111315]/75 to-transparent">
@@ -335,7 +387,7 @@ export default function HomeVariantBotanicalLabel({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {BEERS_CATALOG.map((beer, idx) => {
+            {beersList.map((beer, idx) => {
               const isExpanded = !!expandedHarmonizacao[beer.id];
               const isAdded = !!addedItems[beer.id];
 
@@ -354,6 +406,8 @@ export default function HomeVariantBotanicalLabel({
                           e.currentTarget.src = '/logos/voo-rasante.jpg';
                         }}
                         alt={beer.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-[#F4F1EA]">
@@ -511,7 +565,7 @@ export default function HomeVariantBotanicalLabel({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {CURATED_PACKS.map((pack, idx) => {
+            {packsList.map((pack, idx) => {
               const isAdded = !!addedItems[pack.id];
               const isExpanded = !!expandedHarmonizacao[pack.id];
 
@@ -527,6 +581,8 @@ export default function HomeVariantBotanicalLabel({
                       <img
                         src={pack.image}
                         alt={pack.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                       <div className="absolute top-4 left-4 right-4 flex items-center justify-between text-[10px] uppercase tracking-[0.2em]">
@@ -643,6 +699,8 @@ export default function HomeVariantBotanicalLabel({
               <img
                 src="/logos/hero-cadeia-fria.jpg"
                 alt="Cadeia Fria 2°C Gralha Brewing — Voo Rasante Pilsen em câmara refrigerada"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#111315]/80 via-transparent to-transparent" />
@@ -704,6 +762,8 @@ export default function HomeVariantBotanicalLabel({
                   <img
                     src="/logos/context-textura-taproom.jpg"
                     alt="Serviço de chope fresco em taças Teku na Gralha Brewing"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -798,11 +858,16 @@ export default function HomeVariantBotanicalLabel({
               {contactSent ? (
                 <div className="py-12 text-center space-y-5">
                   <CheckCircle2 className="w-12 h-12 text-[#749B6C] mx-auto stroke-[1.5]" />
+                  {contactProtocol && (
+                    <span className="inline-block font-mono text-xs uppercase tracking-[0.2em] px-3 py-1 border border-[#D88128]/50 bg-[#D88128]/15 text-[#D88128]">
+                      Protocolo Criptografado #{contactProtocol}
+                    </span>
+                  )}
                   <h3 className="font-serif text-3xl text-[#F4F1EA]">
                     Mensagem Recebida pela Cervejaria!
                   </h3>
                   <p className="text-sm text-[#C8C3B8] max-w-md mx-auto leading-relaxed">
-                    Agradecemos o contato. Nosso mestre-cervejeiro ou equipe comercial retornará pelo seu WhatsApp em breve.
+                    Agradecemos o contato. Seus dados foram protegidos com criptografia AES-256-GCM e nossa equipe comercial retornará pelo seu WhatsApp em breve.
                   </p>
                   <div className="pt-4">
                     <button
@@ -816,6 +881,11 @@ export default function HomeVariantBotanicalLabel({
                 </div>
               ) : (
                 <form onSubmit={handleContactSubmit} className="space-y-6">
+                  {contactError && (
+                    <div className="p-3.5 border border-red-500/40 bg-red-950/30 text-xs text-red-200">
+                      {contactError}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[11px] uppercase tracking-[0.2em] text-[#C8C3B8] mb-2">
@@ -897,10 +967,16 @@ export default function HomeVariantBotanicalLabel({
 
                   <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <span className="text-xs text-[#8E969F]">
-                      Atendimento direto de Curitiba — PR.
+                      Atendimento direto de Curitiba — PR (LGPD AES-256-GCM).
                     </span>
-                    <button type="submit" className="btn-craft-b-dark">
-                      <span>Enviar Mensagem</span>
+                    <button
+                      type="submit"
+                      disabled={contactSubmitting}
+                      className="btn-craft-b-dark"
+                    >
+                      <span>
+                        {contactSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
+                      </span>
                       <Send className="w-3.5 h-3.5" />
                     </button>
                   </div>

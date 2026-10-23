@@ -279,6 +279,8 @@ export default function CatalogPage({
                       <img
                         src={beer.image}
                         alt={beer.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#121518]/80 via-transparent to-black/20" />
@@ -293,11 +295,16 @@ export default function CatalogPage({
                         </span>
                       </div>
 
-                      {/* Volume Caption at bottom left */}
-                      <div className="absolute bottom-4 left-4">
+                      {/* Volume & Live Cold-Storage Stock Caption at bottom */}
+                      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                         <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F4F1EA]/80">
                           {beer.volume}
                         </span>
+                        {beer.stock !== undefined && (
+                          <span className="font-mono text-[10px] uppercase tracking-[0.16em] px-2.5 py-1 bg-[#121518]/80 border border-[#749B6C]/40 text-[#749B6C]">
+                            {beer.stock} un. a 2°C
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -465,6 +472,8 @@ export default function CatalogPage({
                     <img
                       src={pack.image}
                       alt={pack.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>

@@ -144,3 +144,107 @@ export function validateOrderPayload(payload) {
     },
   };
 }
+
+/**
+ * Valida o payload de inscrição na Newsletter (Clube do Tanque)
+ */
+export function validateNewsletterPayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return { valid: false, errors: ['Payload JSON inválido.'] };
+  }
+
+  const email = sanitizeString(payload.email, 120).toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  if (!email || !emailRegex.test(email)) {
+    return {
+      valid: false,
+      errors: ['Informe um endereço de e-mail válido.'],
+    };
+  }
+
+  return {
+    valid: true,
+    errors: [],
+    sanitized: {
+      email,
+      source: sanitizeString(payload.source || 'footer_clube_tanque', 40),
+    },
+  };
+}
+
+/**
+ * Valida o payload do formulário de Contato & Eventos
+ */
+export function validateContactPayload(payload) {
+  const errors = [];
+
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return { valid: false, errors: ['Payload JSON inválido.'] };
+  }
+
+  const name = sanitizeString(payload.name, 100);
+  const phone = sanitizeString(payload.phone, 25);
+  const subject = sanitizeString(
+    payload.subject || 'Visitação & Taproom Curitiba',
+    80
+  );
+  const message = sanitizeString(payload.message, 600);
+
+  if (name.length < 2) {
+    errors.push('Informe seu nome (mínimo 2 caracteres).');
+  }
+  if (!/^[0-9()\-\s+]{8,22}$/.test(phone)) {
+    errors.push('Informe um WhatsApp ou telefone válido.');
+  }
+  if (subject.length < 3) {
+    errors.push('Selecione um assunto válido.');
+  }
+  if (message.length < 5) {
+    errors.push('Escreva uma mensagem com pelo menos 5 caracteres.');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    sanitized: {
+      name,
+      phone,
+      subject,
+      message,
+    },
+  };
+}
+
+/**
+ * Valida o payload administrativo de atualização de estoque e lote
+ */
+export function validateStockUpdatePayload(payload) {
+  const errors = [];
+
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return { valid: false, errors: ['Payload JSON inválido.'] };
+  }
+
+  const productId = sanitizeString(payload.productId, 60);
+  const stock = Number(payload.stock);
+  const batch =
+    payload.batch !== undefined ? sanitizeString(payload.batch, 40) : undefined;
+
+  if (!productId || !/^[a-z0-9-]+$/.test(productId)) {
+    errors.push('Identificador de produto inválido.');
+  }
+  if (!Number.isInteger(stock) || stock < 0 || stock > 9999) {
+    errors.push('Quantidade de estoque inválida (permitido: 0 a 9999).');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    sanitized: {
+      productId,
+      stock,
+      batch,
+    },
+  };
+}

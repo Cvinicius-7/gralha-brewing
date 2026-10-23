@@ -1,15 +1,21 @@
 import crypto from 'node:crypto';
 import { BEERS_CATALOG, CURATED_PACKS } from '../src/data/beers.js';
-import { sanitizeString, validateOrderPayload } from '../backend/security/validator.js';
+import {
+  sanitizeString,
+  validateOrderPayload,
+  validateNewsletterPayload,
+  validateContactPayload,
+  validateStockUpdatePayload,
+} from '../backend/security/validator.js';
 
 const PROTOCOL_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-function generateProtocol() {
+function generateProtocol(prefix = 'GRB') {
   const bytes = crypto.randomBytes(10);
   let code = '';
   for (let i = 0; i < 10; i++) {
     code += PROTOCOL_ALPHABET[bytes[i] % PROTOCOL_ALPHABET.length];
   }
-  return `GRB-${code}`;
+  return `${prefix}-${code}`;
 }
 
 export default function handler(req, res) {
@@ -55,6 +61,39 @@ export default function handler(req, res) {
     return;
   }
 
+  // POST /api/newsletter
+  if (req.method === 'POST' && url.includes('/api/newsletter')) {
+    const validation = validateNewsletterPayload(req.body || {});
+    if (!validation.valid) {
+      res.status(400).json({ error: validation.errors[0] });
+      return;
+    }
+    res.status(201).json({
+      status: 'SUBSCRIBED',
+      message: 'E-mail criptografado e registrado no Clube do Tanque.',
+    });
+    return;
+  }
+
+  // POST /api/contact
+  if (req.method === 'POST' && url.includes('/api/contact')) {
+    const validation = validateContactPayload(req.body || {});
+    if (!validation.valid) {
+      res.status(400).json({
+        error: validation.errors[0],
+        details: validation.errors,
+      });
+      return;
+    }
+    const protocol = generateProtocol('MSG');
+    res.status(201).json({
+      status: 'RECEIVED',
+      protocol,
+      firstName: validation.sanitized.name.split(' ')[0],
+    });
+    return;
+  }
+
   // POST /api/orders
   if (req.method === 'POST' && url.includes('/api/orders')) {
     const validation = validateOrderPayload(req.body || {});
@@ -96,7 +135,7 @@ export default function handler(req, res) {
       Math.max(0, serverSubtotal - serverDiscount + serverShippingCost).toFixed(2)
     );
 
-    const protocol = generateProtocol();
+    const protocol = generateProtocol('GRB');
     res.status(201).json({
       protocol,
       status: 'CONFIRMED',
@@ -108,6 +147,20 @@ export default function handler(req, res) {
       discount: serverDiscount,
       total: serverTotal,
       securityBadge: 'AES-256-GCM Encrypted & Server-Verified',
+    });
+    return;
+  }
+
+  // PATCH /api/admin/stock (Serverless fallback)
+  if (req.method === 'PATCH' && url.includes('/api/admin/stock')) {
+    const validation = validateStockUpdatePayload(req.body || {});
+    if (!validation.valid) {
+      res.status(400).json({ error: validation.errors[0] });
+      return;
+    }
+    res.status(200).json({
+      status: 'UPDATED',
+      ...validation.sanitized,
     });
     return;
   }

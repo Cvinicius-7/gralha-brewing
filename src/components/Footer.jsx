@@ -7,11 +7,14 @@ import {
   Mail,
   CheckCircle2,
   ShieldCheck,
+  Lock,
 } from 'lucide-react';
 
 export default function Footer({ onResetAgeGate, onNavigate }) {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
+  const [newsletterError, setNewsletterError] = useState(null);
 
   const handleAnchorNav = (page, selector) => {
     onNavigate(page);
@@ -27,13 +30,39 @@ export default function Footer({ onResetAgeGate, onNavigate }) {
     }, 60);
   };
 
-  const handleNewsletterSubmit = (e) => {
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
-    if (!newsletterEmail.trim()) return;
-    setNewsletterSubscribed(true);
-    setTimeout(() => {
+    const trimmed = newsletterEmail.trim();
+    if (!trimmed) return;
+
+    setNewsletterSubmitting(true);
+    setNewsletterError(null);
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Gralha-Client': 'webapp-v1',
+        },
+        body: JSON.stringify({
+          email: trimmed,
+          source: 'footer_clube_tanque',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Não foi possível registrar seu e-mail.');
+      }
+
+      setNewsletterSubscribed(true);
       setNewsletterEmail('');
-    }, 300);
+    } catch (err) {
+      setNewsletterError(err.message);
+    } finally {
+      setNewsletterSubmitting(false);
+    }
   };
 
   return (
@@ -95,16 +124,25 @@ export default function Footer({ onResetAgeGate, onNavigate }) {
                   </div>
                   <button
                     type="submit"
+                    disabled={newsletterSubmitting}
                     className="btn-craft-b-dark !py-3.5 !px-7 shrink-0"
                   >
-                    <span>Assinar Lista</span>
+                    <span>
+                      {newsletterSubmitting ? 'Gravando...' : 'Assinar Lista'}
+                    </span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </form>
               )}
-              <p className="text-[11px] text-[#8E969F] mt-2.5">
-                Sem spam. Apenas alertas de envase fresco (2°C) e pré-venda de barris em Curitiba.
-              </p>
+              {newsletterError ? (
+                <p className="text-[11px] text-red-400 mt-2">
+                  {newsletterError}
+                </p>
+              ) : (
+                <p className="text-[11px] text-[#8E969F] mt-2.5">
+                  Sem spam. Apenas alertas de envase fresco (2°C) e pré-venda de barris em Curitiba (PII criptografado com AES-256-GCM).
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -123,6 +161,8 @@ export default function Footer({ onResetAgeGate, onNavigate }) {
               <img
                 src="/logos/selo-completo-transparente.png"
                 alt="Selo Oficial Gralha Brewing Co."
+                loading="lazy"
+                decoding="async"
                 className="w-14 h-14 object-contain transition-transform duration-500 group-hover:scale-105"
               />
               <div>
@@ -442,9 +482,19 @@ export default function Footer({ onResetAgeGate, onNavigate }) {
           <p>
             © {new Date().getFullYear()} Gralha Brewing Co. Todos os direitos reservados • Curitiba — PR.
           </p>
-          <p className="uppercase tracking-[0.18em] text-[10px] text-[#C8C3B8]/80">
-            Beba com sabedoria • Venda proibida para menores de 18 anos
-          </p>
+          <div className="flex flex-wrap items-center gap-6">
+            <p className="uppercase tracking-[0.18em] text-[10px] text-[#C8C3B8]/80">
+              Beba com sabedoria • Venda proibida para menores de 18 anos
+            </p>
+            <button
+              type="button"
+              onClick={() => handleAnchorNav('admin', null)}
+              className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#8E969F] hover:text-[#D88128] transition-colors"
+            >
+              <Lock className="w-3 h-3 text-[#D88128]" />
+              <span>Painel Cervejeiro</span>
+            </button>
+          </div>
         </div>
       </div>
     </footer>

@@ -59,7 +59,7 @@ export function applySecurityHeaders(req, res) {
     res.setHeader('Access-Control-Allow-Origin', CONFIG.ALLOWED_ORIGINS[0]);
   }
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Gralha-Client');
   res.setHeader('Access-Control-Max-Age', '86400');
 

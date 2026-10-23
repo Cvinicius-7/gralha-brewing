@@ -10,7 +10,13 @@ import {
   generateSecureProtocol,
   verifySecretTimingSafe,
 } from './security/crypto.js';
-import { sanitizeString, validateOrderPayload } from './security/validator.js';
+import {
+  sanitizeString,
+  validateOrderPayload,
+  validateNewsletterPayload,
+  validateContactPayload,
+  validateStockUpdatePayload,
+} from './security/validator.js';
 import {
   applySecurityHeaders,
   checkRateLimit,
@@ -66,13 +72,72 @@ const selectOrderItemsStmt = db.prepare(`
   WHERE order_id = ?
 `);
 
-const countOrdersStmt = db.prepare(`SELECT COUNT(*) AS total FROM orders`);
+const countOrdersStmt = db.prepare(`SELECT COUNT(*) AS total, COALESCE(SUM(total), 0) AS revenue FROM orders`);
+const countSubscribersStmt = db.prepare(`SELECT COUNT(*) AS total FROM newsletter_subscribers`);
+const countMessagesStmt = db.prepare(`SELECT COUNT(*) AS total FROM contact_messages`);
+const countAuditStmt = db.prepare(`SELECT COUNT(*) AS total FROM security_audit_logs`);
+
 const recentAuditStmt = db.prepare(`
-  SELECT id, event_type, severity, created_at
+  SELECT id, event_type, severity, ip_hash, details, created_at
   FROM security_audit_logs
   ORDER BY id DESC
-  LIMIT 10
+  LIMIT 35
 `);
+
+const insertNewsletterStmt = db.prepare(`
+  INSERT INTO newsletter_subscribers (email_enc, email_hash, source, client_ip_hash)
+  VALUES (?, ?, ?, ?)
+  ON CONFLICT(email_hash) DO NOTHING
+`);
+
+const insertContactStmt = db.prepare(`
+  INSERT INTO contact_messages (
+    protocol, name_enc, phone_enc, phone_hash, subject, message_enc, status, client_ip_hash
+  ) VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?)
+`);
+
+const selectRecentOrdersStmt = db.prepare(`
+  SELECT id, protocol, customer_name_enc, customer_phone_enc, cep_masked,
+         delivery_method, payment_method, card_masked, subtotal, shipping_cost,
+         discount, total, status, created_at
+  FROM orders
+  ORDER BY id DESC
+  LIMIT 25
+`);
+
+const selectRecentMessagesStmt = db.prepare(`
+  SELECT id, protocol, name_enc, phone_enc, subject, message_enc, status, created_at
+  FROM contact_messages
+  ORDER BY id DESC
+  LIMIT 25
+`);
+
+const selectRecentSubscribersStmt = db.prepare(`
+  SELECT id, email_enc, source, created_at
+  FROM newsletter_subscribers
+  ORDER BY id DESC
+  LIMIT 25
+`);
+
+const updateProductStockStmt = db.prepare(`
+  UPDATE products
+  SET stock = ?, batch = COALESCE(?, batch), updated_at = datetime('now')
+  WHERE id = ?
+`);
+
+const updateMessageStatusStmt = db.prepare(`
+  UPDATE contact_messages
+  SET status = ?
+  WHERE id = ?
+`);
+
+function safeDecryptPII(cipherText, fallback = 'Protegido') {
+  try {
+    return decryptPII(cipherText) || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 function sendJson(res, statusCode, data) {
   const payload = JSON.stringify(data);
@@ -401,8 +466,120 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // ROTA 5: Auditoria Administrativa Protegida por Token Timing-Safe (/api/admin/audit)
-    if (req.method === 'GET' && pathname === '/api/admin/audit') {
+    // ROTA 5: Inscrição Segura no Clube do Tanque / Newsletter (/api/newsletter)
+    if (req.method === 'POST' && pathname === '/api/newsletter') {
+      const nlLimit = checkRateLimit(clientIp, 'newsletter', 10, 15 * 60_000);
+      if (!nlLimit.allowed) {
+        logSecurityEvent('NEWSLETTER_RATE_LIMIT', 'WARN', nlLimit.ipHash, {
+          path: pathname,
+        });
+        sendJson(res, 429, {
+          error: 'Limite de inscrições atingido. Aguarde alguns minutos.',
+        });
+        return;
+      }
+
+      const body = await parseSafeJsonBody(req);
+      const validation = validateNewsletterPayload(body);
+      if (!validation.valid) {
+        sendJson(res, 400, { error: validation.errors[0] });
+        return;
+      }
+
+      const { email, source } = validation.sanitized;
+      const emailEnc = encryptPII(email);
+      const emailHash = createBlindHash(email);
+
+      insertNewsletterStmt.run(emailEnc, emailHash, source, nlLimit.ipHash);
+
+      logSecurityEvent('NEWSLETTER_SUBSCRIBED', 'INFO', nlLimit.ipHash, {
+        source,
+      });
+
+      sendJson(res, 201, {
+        status: 'SUBSCRIBED',
+        message: 'E-mail criptografado e registrado no Clube do Tanque.',
+      });
+      return;
+    }
+
+    // ROTA 6: Mensagem Comercial / Visitação & Eventos (/api/contact)
+    if (req.method === 'POST' && pathname === '/api/contact') {
+      const contactLimit = checkRateLimit(clientIp, 'contact', 8, 15 * 60_000);
+      if (!contactLimit.allowed) {
+        logSecurityEvent('CONTACT_RATE_LIMIT', 'WARN', contactLimit.ipHash, {
+          path: pathname,
+        });
+        sendJson(res, 429, {
+          error: 'Limite de mensagens atingido. Aguarde alguns minutos.',
+        });
+        return;
+      }
+
+      const body = await parseSafeJsonBody(req);
+      const validation = validateContactPayload(body);
+      if (!validation.valid) {
+        sendJson(res, 400, {
+          error: validation.errors[0],
+          details: validation.errors,
+        });
+        return;
+      }
+
+      const { name, phone, subject, message } = validation.sanitized;
+      const nameEnc = encryptPII(name);
+      const phoneEnc = encryptPII(phone);
+      const phoneHash = createBlindHash(phone);
+      const messageEnc = encryptPII(message);
+      const protocol = generateSecureProtocol().replace('GRB-', 'MSG-');
+
+      insertContactStmt.run(
+        protocol,
+        nameEnc,
+        phoneEnc,
+        phoneHash,
+        subject,
+        messageEnc,
+        contactLimit.ipHash
+      );
+
+      logSecurityEvent('CONTACT_MESSAGE_RECEIVED', 'INFO', contactLimit.ipHash, {
+        protocol,
+        subject,
+      });
+
+      sendJson(res, 201, {
+        status: 'RECEIVED',
+        protocol,
+        firstName: name.split(' ')[0],
+      });
+      return;
+    }
+
+    // ROTA 7: Auto-preenchimento de Token de Desenvolvimento (Restrito a Loopback 127.0.0.1 / ::1)
+    if (req.method === 'GET' && pathname === '/api/admin/dev-token') {
+      const remoteAddr = req.socket.remoteAddress || '';
+      const isLocalLoopback =
+        remoteAddr === '127.0.0.1' ||
+        remoteAddr === '::1' ||
+        remoteAddr === '::ffff:127.0.0.1';
+
+      if (!isLocalLoopback || process.env.NODE_ENV === 'production') {
+        sendJson(res, 403, {
+          error: 'Disponível exclusivamente em ambiente local (127.0.0.1).',
+        });
+        return;
+      }
+
+      sendJson(res, 200, { token: CONFIG.ADMIN_TOKEN });
+      return;
+    }
+
+    // ROTA 8: Painel Administrativo & Auditoria Protegida por Token Timing-Safe (/api/admin/audit & /api/admin/overview)
+    if (
+      req.method === 'GET' &&
+      (pathname === '/api/admin/audit' || pathname === '/api/admin/overview')
+    ) {
       const authHeader = req.headers.authorization || '';
       const token = authHeader.replace(/^Bearer\s+/i, '').trim();
 
@@ -410,12 +587,146 @@ const server = http.createServer(async (req, res) => {
         logSecurityEvent('UNAUTHORIZED_ADMIN_ACCESS', 'CRITICAL', generalLimit.ipHash, {
           path: pathname,
         });
+        sendJson(res, 401, { error: 'Token administrativo inválido ou não autorizado.' });
+        return;
+      }
+
+      const orderStats = countOrdersStmt.get();
+      const subscriberStats = countSubscribersStmt.get();
+      const messageStats = countMessagesStmt.get();
+      const auditStats = countAuditStmt.get();
+
+      const products = selectActiveProductsStmt.all();
+      const rawOrders = selectRecentOrdersStmt.all();
+      const orders = rawOrders.map((o) => ({
+        id: o.id,
+        protocol: o.protocol,
+        customerName: safeDecryptPII(o.customer_name_enc, 'Cliente Protegido'),
+        customerPhone: safeDecryptPII(o.customer_phone_enc, '—'),
+        cepMasked: o.cep_masked,
+        deliveryMethod: o.delivery_method,
+        paymentMethod: o.payment_method,
+        cardMasked: o.card_masked,
+        subtotal: o.subtotal,
+        shippingCost: o.shipping_cost,
+        discount: o.discount,
+        total: o.total,
+        status: o.status,
+        createdAt: o.created_at,
+        items: selectOrderItemsStmt.all(o.id),
+      }));
+
+      const rawMessages = selectRecentMessagesStmt.all();
+      const messages = rawMessages.map((m) => ({
+        id: m.id,
+        protocol: m.protocol,
+        name: safeDecryptPII(m.name_enc, 'Visitante'),
+        phone: safeDecryptPII(m.phone_enc, '—'),
+        subject: m.subject,
+        message: safeDecryptPII(m.message_enc, ''),
+        status: m.status,
+        createdAt: m.created_at,
+      }));
+
+      const rawSubscribers = selectRecentSubscribersStmt.all();
+      const subscribers = rawSubscribers.map((s) => ({
+        id: s.id,
+        email: safeDecryptPII(s.email_enc, '***@***'),
+        source: s.source,
+        createdAt: s.created_at,
+      }));
+
+      const logs = recentAuditStmt.all();
+
+      sendJson(res, 200, {
+        metrics: {
+          ordersCount: orderStats?.total || 0,
+          revenueTotal: Number((orderStats?.revenue || 0).toFixed(2)),
+          subscribersCount: subscriberStats?.total || 0,
+          messagesCount: messageStats?.total || 0,
+          auditEventsCount: auditStats?.total || 0,
+        },
+        products,
+        orders,
+        messages,
+        subscribers,
+        auditLogs: logs,
+      });
+      return;
+    }
+
+    // ROTA 9: Atualização de Estoque & Lote da Câmara Fria (/api/admin/stock)
+    if (req.method === 'PATCH' && pathname === '/api/admin/stock') {
+      const authHeader = req.headers.authorization || '';
+      const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+      if (!verifySecretTimingSafe(token, CONFIG.ADMIN_TOKEN)) {
+        logSecurityEvent('UNAUTHORIZED_STOCK_UPDATE', 'CRITICAL', generalLimit.ipHash, {
+          path: pathname,
+        });
         sendJson(res, 401, { error: 'Acesso não autorizado.' });
         return;
       }
 
-      const logs = recentAuditStmt.all();
-      sendJson(res, 200, { auditLogs: logs });
+      const body = await parseSafeJsonBody(req);
+      const validation = validateStockUpdatePayload(body);
+      if (!validation.valid) {
+        sendJson(res, 400, { error: validation.errors[0] });
+        return;
+      }
+
+      const { productId, stock, batch } = validation.sanitized;
+      const result = updateProductStockStmt.run(
+        stock,
+        batch && batch.length > 0 ? batch : null,
+        productId
+      );
+
+      if (result.changes === 0) {
+        sendJson(res, 404, { error: 'Produto não encontrado no banco SQLite.' });
+        return;
+      }
+
+      logSecurityEvent('ADMIN_STOCK_UPDATED', 'INFO', generalLimit.ipHash, {
+        productId,
+        newStock: stock,
+        batch: batch || 'unchanged',
+      });
+
+      sendJson(res, 200, {
+        status: 'UPDATED',
+        productId,
+        stock,
+        batch,
+      });
+      return;
+    }
+
+    // ROTA 10: Atualização de Status de Mensagem Comercial (/api/admin/messages)
+    if (req.method === 'PATCH' && pathname === '/api/admin/messages') {
+      const authHeader = req.headers.authorization || '';
+      const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+      if (!verifySecretTimingSafe(token, CONFIG.ADMIN_TOKEN)) {
+        sendJson(res, 401, { error: 'Acesso não autorizado.' });
+        return;
+      }
+
+      const body = await parseSafeJsonBody(req);
+      const id = Number(body?.id);
+      const status = sanitizeString(body?.status, 20);
+      if (!Number.isInteger(id) || !['PENDING', 'ANSWERED', 'ARCHIVED'].includes(status)) {
+        sendJson(res, 400, { error: 'Parâmetros inválidos.' });
+        return;
+      }
+
+      updateMessageStatusStmt.run(status, id);
+      logSecurityEvent('ADMIN_MESSAGE_UPDATED', 'INFO', generalLimit.ipHash, {
+        messageId: id,
+        status,
+      });
+
+      sendJson(res, 200, { status: 'UPDATED', id, newStatus: status });
       return;
     }
 

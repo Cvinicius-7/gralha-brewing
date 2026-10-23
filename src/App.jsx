@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import HomeVariantBotanicalLabel from './components/home-variants/HomeVariantBotanicalLabel';
 import CatalogPage from './components/CatalogPage';
+import AdminDashboard from './components/AdminDashboard';
 import QuickCartDrawer from './components/QuickCartDrawer';
 import AgeGateModal from './components/AgeGateModal';
 import Footer from './components/Footer';
@@ -13,10 +14,27 @@ export default function App() {
 
   // 'brand' = Página 1 (Home Oficial — Variação 2 Aprovada)
   // 'catalog' = Página 2 (Catálogo de Cervejas & Loja Online)
+  // 'admin' = Painel do Mestre Cervejeiro & Auditoria AppSec
   const [activePage, setActivePage] = useState('brand');
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('gralha_cart_v1');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+  // Persiste a sacola no localStorage a cada atualização
+  useEffect(() => {
+    try {
+      localStorage.setItem('gralha_cart_v1', JSON.stringify(cart));
+    } catch {
+      // Ignora caso o storage esteja bloqueado
+    }
+  }, [cart]);
 
   const handleConfirmAge = () => {
     localStorage.setItem('gralha_age_verified', 'true');
@@ -90,7 +108,9 @@ export default function App() {
       />
 
       <main className="flex-grow">
-        {activePage === 'brand' ? (
+        {activePage === 'admin' ? (
+          <AdminDashboard onBackToStore={() => setActivePage('brand')} />
+        ) : activePage === 'brand' ? (
           <HomeVariantBotanicalLabel
             onGoToCatalog={handleGoToCatalog}
             onAddToCart={handleAddToCart}

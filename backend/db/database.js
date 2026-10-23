@@ -89,6 +89,28 @@ db.exec(`
     details TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email_enc TEXT NOT NULL,
+    email_hash TEXT NOT NULL UNIQUE,
+    source TEXT NOT NULL DEFAULT 'footer_clube_tanque',
+    client_ip_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS contact_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    protocol TEXT NOT NULL UNIQUE,
+    name_enc TEXT NOT NULL,
+    phone_enc TEXT NOT NULL,
+    phone_hash TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    message_enc TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING' CHECK(status IN ('PENDING', 'ANSWERED', 'ARCHIVED')),
+    client_ip_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 /**
