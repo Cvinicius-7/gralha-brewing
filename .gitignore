@@ -19,3 +19,7 @@ backend/data/*.sqlite-wal
 # Logs
 *.log
 npm-debug.log*
+
+# Local AI Skills & Design Working Directories
+.agents/
+.taste-skill/

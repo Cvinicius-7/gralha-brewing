@@ -59,6 +59,7 @@ export const CONFIG = {
   AES_KEY_HEX: process.env.DATA_ENCRYPTION_KEY_HEX,
   HMAC_SECRET: process.env.HMAC_BLIND_INDEX_SECRET,
   ADMIN_TOKEN: process.env.ADMIN_API_TOKEN,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   DB_PATH: path.join(__dirname, 'data', 'gralha_brewing.sqlite'),
   MAX_BODY_BYTES: 16 * 1024, // 16 KB max payload (anti-DoS)
   MAX_RATE_LIMIT_BUCKETS: 5000, // Limite de buckets em memória (anti-Memory Exhaustion)

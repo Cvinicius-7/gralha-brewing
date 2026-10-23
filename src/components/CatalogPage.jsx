@@ -314,55 +314,62 @@ export default function CatalogPage({
                       </p>
                     </div>
 
-                    {/* Collapsible Sensory Sheet Trigger */}
+                    {/* Collapsible Sensory Sheet Trigger (Smooth Accordion) */}
                     <div className="mt-4 pt-3 border-t border-white/[0.07]">
                       <button
                         type="button"
+                        aria-expanded={isExpanded}
                         onClick={() =>
                           setExpandedBeerId(isExpanded ? null : beer.id)
                         }
-                        className="w-full flex items-center justify-between py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#8E969F] hover:text-[#F4F1EA] transition-colors"
+                        className="w-full flex items-center justify-between py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#8E969F] hover:text-[#D88128] transition-colors duration-300"
                       >
                         <span>Ficha Sensorial &amp; Harmonização</span>
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
+                        <ChevronDown
+                          className={`w-4 h-4 text-[#D88128] transition-transform duration-300 ease-in-out ${
+                            isExpanded ? 'rotate-180' : 'rotate-0'
+                          }`}
+                        />
                       </button>
 
-                      {isExpanded && (
-                        <div className="mt-4 pb-2 space-y-3 text-xs border-t border-white/[0.06] pt-4 text-[#F4F1EA]/80 font-light">
-                          <div className="flex justify-between">
-                            <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#8E969F]">
-                              Lúpulos
-                            </span>
-                            <span className="text-right">{beer.hops.join(', ')}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#8E969F]">
-                              Maltes
-                            </span>
-                            <span className="text-right">{beer.malts.join(', ')}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#8E969F]">
-                              Serviço &amp; Copo
-                            </span>
-                            <span className="text-right">
-                              {beer.temp} · {beer.glass}
-                            </span>
-                          </div>
-                          <div className="pt-1">
-                            <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#D88128] block mb-1">
-                              Harmoniza com
-                            </span>
-                            <p className="text-[#F4F1EA]/75">
-                              {beer.pairing.join(' · ')}
-                            </p>
+                      <div
+                        className={`accordion-shell ${
+                          isExpanded ? 'is-open' : ''
+                        }`}
+                      >
+                        <div className="accordion-inner">
+                          <div className="mt-3 pb-2 space-y-3 text-xs border-t border-white/[0.06] pt-4 text-[#F4F1EA]/80 font-light">
+                            <div className="flex justify-between">
+                              <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#8E969F]">
+                                Lúpulos
+                              </span>
+                              <span className="text-right">{beer.hops.join(', ')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#8E969F]">
+                                Maltes
+                              </span>
+                              <span className="text-right">{beer.malts.join(', ')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#8E969F]">
+                                Serviço &amp; Copo
+                              </span>
+                              <span className="text-right">
+                                {beer.temp} · {beer.glass}
+                              </span>
+                            </div>
+                            <div className="pt-1">
+                              <span className="font-mono uppercase text-[10px] tracking-[0.15em] text-[#D88128] block mb-1">
+                                Harmoniza com
+                              </span>
+                              <p className="text-[#F4F1EA]/75">
+                                {beer.pairing.join(' · ')}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
 
@@ -403,10 +410,8 @@ export default function CatalogPage({
                       <button
                         type="button"
                         onClick={() => triggerAdded(beer)}
-                        className={`inline-flex items-center gap-2.5 px-6 py-3.5 font-mono text-xs uppercase tracking-[0.18em] transition-colors ${
-                          justAdded
-                            ? 'bg-[#5A7D53] text-[#F4F1EA]'
-                            : 'bg-[#F4F1EA] text-[#121518] hover:bg-[#D88128]'
+                        className={`btn-craft-b-dark !px-6 !py-3.5 ${
+                          justAdded ? 'btn-added-feedback' : ''
                         }`}
                       >
                         {justAdded ? (
@@ -456,11 +461,11 @@ export default function CatalogPage({
                   key={pack.id}
                   className="grid grid-cols-1 sm:grid-cols-12 gap-8 items-center border-t border-[#121518]/15 pt-8"
                 >
-                  <div className="sm:col-span-5 aspect-[4/5] overflow-hidden bg-[#121518]/5">
+                  <div className="sm:col-span-5 aspect-[4/3] sm:aspect-[4/5] overflow-hidden bg-[#121518]/5">
                     <img
                       src={pack.image}
                       alt={pack.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
 
@@ -490,7 +495,9 @@ export default function CatalogPage({
                       <button
                         type="button"
                         onClick={() => triggerAdded(pack)}
-                        className="inline-flex items-center gap-3 bg-[#121518] text-[#F4F1EA] px-7 py-4 font-mono text-xs uppercase tracking-[0.18em] hover:bg-[#D88128] hover:text-[#121518] transition-colors"
+                        className={`btn-craft-b ${
+                          justAdded ? 'btn-added-feedback' : ''
+                        }`}
                       >
                         {justAdded ? (
                           <>

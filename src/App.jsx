@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import HeroSection from './components/HeroSection';
-import PhaseOneShowcase from './components/PhaseOneShowcase';
+import HomeVariantBotanicalLabel from './components/home-variants/HomeVariantBotanicalLabel';
 import CatalogPage from './components/CatalogPage';
 import QuickCartDrawer from './components/QuickCartDrawer';
 import AgeGateModal from './components/AgeGateModal';
@@ -12,7 +11,7 @@ export default function App() {
     return localStorage.getItem('gralha_age_verified') === 'true';
   });
 
-  // 'brand' = Página 1 (Institucional / Marca)
+  // 'brand' = Página 1 (Home Oficial — Variação 2 Aprovada)
   // 'catalog' = Página 2 (Catálogo de Cervejas & Loja Online)
   const [activePage, setActivePage] = useState('brand');
   const [cart, setCart] = useState([]);
@@ -49,6 +48,7 @@ export default function App() {
           name: product.name,
           style: product.style,
           price: product.price,
+          image: product.image || '/logos/voo-rasante.jpg',
           qty: 1,
         },
       ];
@@ -76,7 +76,7 @@ export default function App() {
   const totalItemsCount = cart.reduce((acc, item) => acc + item.qty, 0);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#121518] text-[#F4F1EA]">
+    <div className="min-h-screen flex flex-col bg-[#111315] text-[#F4F1EA]">
       <AgeGateModal
         isOpen={!ageVerified}
         onConfirm={handleConfirmAge}
@@ -91,10 +91,11 @@ export default function App() {
 
       <main className="flex-grow">
         {activePage === 'brand' ? (
-          <>
-            <HeroSection onGoToCatalog={handleGoToCatalog} />
-            <PhaseOneShowcase onGoToCatalog={handleGoToCatalog} />
-          </>
+          <HomeVariantBotanicalLabel
+            onGoToCatalog={handleGoToCatalog}
+            onAddToCart={handleAddToCart}
+            onOpenCart={() => setCartOpen(true)}
+          />
         ) : (
           <CatalogPage
             cart={cart}
@@ -122,6 +123,9 @@ export default function App() {
         onProceedToCheckout={() => {
           setActivePage('catalog');
           setCheckoutOpen(true);
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 80);
         }}
       />
     </div>

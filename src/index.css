@@ -3,11 +3,208 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     background-color: #111315;
     color: #F4F1EA;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  :focus-visible {
+    outline: 2px solid #D88128;
+    outline-offset: 4px;
+  }
+}
+
+/* Refined Cubic-Bezier Motion & Luxury CTA System */
+@layer components {
+  /* Variation A CTA: Tactile Sliding Ink Fill & Hairline Precision */
+  .btn-craft-a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    padding: 1rem 2.15rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #F4F1EA;
+    background-color: #1D435A;
+    border: 1px solid #1D435A;
+    box-shadow: 0 12px 28px -8px rgba(19, 44, 60, 0.35);
+    transition:
+      background-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-craft-a:hover {
+    background-color: #111315;
+    border-color: #111315;
+    color: #F4F1EA;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px -8px rgba(17, 19, 21, 0.42);
+  }
+  .btn-craft-a:active {
+    transform: translateY(0);
+  }
+
+  /* Variation B CTA: Architectural Double-Rule Frame (SEACLUB / KAELON Luxury) */
+  .btn-craft-b {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    padding: 0.95rem 2.25rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #111315;
+    background-color: transparent;
+    border: 1px solid rgba(17, 19, 21, 0.55);
+    transition:
+      background-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-craft-b:hover {
+    background-color: #1D435A;
+    border-color: #1D435A;
+    color: #F4F1EA;
+    box-shadow: 0 14px 32px -10px rgba(29, 67, 90, 0.45);
+  }
+
+  .btn-craft-b-dark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    padding: 0.95rem 2.25rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #F4F1EA;
+    background-color: transparent;
+    border: 1px solid rgba(244, 241, 234, 0.35);
+    transition:
+      background-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-craft-b-dark:hover {
+    background-color: #D88128;
+    border-color: #D88128;
+    color: #111315;
+    box-shadow: 0 16px 36px -10px rgba(216, 129, 40, 0.4);
+  }
+
+  /* Variation C CTA: Soft Pill / Chamfered Tactile Amber & Obsidian */
+  .btn-craft-c {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem;
+    padding: 0.95rem 2.15rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #111315;
+    background-color: #D88128;
+    border: 1px solid #D88128;
+    box-shadow: 0 10px 24px -6px rgba(216, 129, 40, 0.32);
+    transition:
+      background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-craft-c:hover {
+    background-color: #111315;
+    border-color: #111315;
+    color: #F4F1EA;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px -8px rgba(17, 19, 21, 0.45);
+  }
+  /* Smooth Scroll Reveal Choreography */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(36px) scale(0.985);
+    filter: blur(4px);
+    transition:
+      opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform, filter;
+  }
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+
+  /* Fluid Accordion Height Transition (Zero Harsh Cut) */
+  .accordion-shell {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.34s ease-in-out;
+  }
+  .accordion-shell.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .accordion-inner {
+    overflow: hidden;
+  }
+
+  /* Add-to-Bag Button Confirmation State */
+  .btn-added-feedback {
+    background-color: #5A7D53 !important;
+    border-color: #749B6C !important;
+    color: #F4F1EA !important;
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 14px 30px -8px rgba(90, 125, 83, 0.45) !important;
+  }
+}
+
+@keyframes bagLift {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  35% {
+    transform: scale(1.08) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-bag-lift {
+  animation: bagLift 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

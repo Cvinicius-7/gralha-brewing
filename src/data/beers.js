@@ -73,8 +73,7 @@ export const BEERS_CATALOG = [
     price: 25.9,
     batch: 'Lote #021',
     isFlagship: true,
-    image:
-      'https://images.unsplash.com/photo-1566633806327-68e152aaf26d?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/can-gralha-azul-ipa.png',
     shortDesc:
       'Amargor limpo e assertivo como manda a escola californiana, notas resinosas de pinho em homenagem às araucárias, maracujá e toranja.',
     hops: ['Simcoe', 'Centennial', 'Citra'],
@@ -95,8 +94,7 @@ export const BEERS_CATALOG = [
     price: 28.9,
     batch: 'Lote #022',
     isFlagship: true,
-    image:
-      'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/can-copa-araucarias-neipa.png',
     shortDesc:
       'Turbidez aveludada pela aveia e trigo, amargor macio e uma explosão tropical de manga madura, pêssego e frutas amarelas.',
     hops: ['Mosaic', 'Galaxy', 'El Dorado'],
@@ -117,8 +115,7 @@ export const BEERS_CATALOG = [
     price: 20.9,
     batch: 'Lote #018',
     isFlagship: false,
-    image:
-      'https://images.unsplash.com/photo-1575037614876-c38a4d44f5b8?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/can-neblina-serra-hop-lager.jpg',
     shortDesc:
       'A leveza crocante de uma Lager curitibana com adição generosa de Citra no Dry Hopping. Final seco, limpo e aroma de limão siciliano.',
     hops: ['Citra', 'Motueka'],
@@ -139,8 +136,7 @@ export const BEERS_CATALOG = [
     price: 22.5,
     batch: 'Lote #019',
     isFlagship: false,
-    image:
-      'https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/can-brisa-parque-session-ipa.jpg',
     shortDesc:
       'Todo o aroma cítrico de uma IPA americana com corpo leve e baixo teor alcoólico. Perfeita para tardes inteiras de churrasco.',
     hops: ['Amarillo', 'Cascade'],
@@ -161,8 +157,7 @@ export const BEERS_CATALOG = [
     price: 23.9,
     batch: 'Lote #015',
     isFlagship: false,
-    image:
-      'https://images.unsplash.com/photo-1518176258769-f227c798150e?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/can-noite-fria-dry-stout.jpg',
     shortDesc:
       'Feita para os dias frios de Curitiba. Notas intensas de café espresso recém-extraído, cacau amargo 70% e espuma cremosa cor de avelã.',
     hops: ['East Kent Goldings'],
@@ -183,8 +178,8 @@ export const CURATED_PACKS = [
     price: 126.9,
     originalPrice: 141.0,
     volume: 'Pack 6x 473ml',
-    image:
-      'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/pack-degustacao-6.jpg',
+    pairing: ['Tábua de charcutaria e queijos', 'Churrasco completo entre amigos', 'Sobremesas com chocolate amargo'],
   },
   {
     id: 'pack-hop-lovers-4',
@@ -195,7 +190,7 @@ export const CURATED_PACKS = [
     price: 94.9,
     originalPrice: 103.2,
     volume: 'Pack 4x 473ml',
-    image:
-      'https://images.unsplash.com/photo-1566633806327-68e152aaf26d?auto=format&fit=crop&w=1000&q=85',
+    image: '/logos/pack-lupuladas-4.jpg',
+    pairing: ['Smash Burger artesanal', 'Costelinha defumada BBQ', 'Tacos apimentados e petiscos cítricos'],
   },
 ];
